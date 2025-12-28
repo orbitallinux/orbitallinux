@@ -1,14 +1,13 @@
 #!/bin/sh
 
 KERNEL_VERSION=6.1.159
-BUSYBOX_VERSION=snapshot
+TOYBOX_VERSION=0.8.13
 
-# initrd
-
+mkdir src
 cd src
 
-cd busybox
+wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$KERNEL_VERSION.tar.xz
+tar xf linux-$KERNEL_VERSION.tar.xz
 
-mkdir -p "../../output/initrd"
-
-make CONFIG_PREFIX=../../output/initrd install
+wget https://landley.net/toybox/downloads/toybox-$TOYBOX_VERSION.tar.gz
+tar xf toybox-$TOYBOX_VERSION.tar.gz

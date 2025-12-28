@@ -54,6 +54,7 @@ make defconfig
 
 # End of changing kernel configurations
 
+yes "" | make oldconfig
 make || exit
 
 cp arch/x86/boot/bzImage ../../output/bzImage
