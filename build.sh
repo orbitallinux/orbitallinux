@@ -1,40 +1,29 @@
 #!/bin/sh
 
 KERNEL_VERSION=6.1.159
-BUSYBOX_VERSION=snapshot
+TOYBOX_VERSION=0.8.13
 
 mkdir -p src
 cd src
 
-# Kernel
-wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$KERNEL_VERSION.tar.xz
-tar -xf linux-$KERNEL_VERSION.tar.xz
-cd linux-$KERNEL_VERSION
+# Toybox
+
+wget https://landley.net/toybox/downloads/toybox-$TOYBOX_VERSION.tar.gz
+tar xf toybox-$TOYBOX_VERSION.tar.gz
+
+cd toybox-$TOYBOX_VERSION
+
+mkdir -p "../../output/initrd"
 
 make defconfig
 make || exit
-
-cp arch/x86/boot/bzImage ../../output/bzImage
+make PREFIX=../../output/initrd install
 
 cd ..
 
-# Busybox
-
-wget https://busybox.net/downloads/busybox-$BUSYBOX_VERSION.tar.bz2
-tar -xf busybox-$BUSYBOX_VERSION.tar.bz2
-cd busybox-$BUSYBOX_VERSION || cd busybox
-
-make defconfig
-sed 's/^.*CONFIG_STATIC[^_].*$/CONFIG_STATIC=y/g' -i .config
-sed 's/^.*CONFIG_TC[^_].*$/CONFIG_TC=n/g' -i .config
-make || exit
-
 # initrd
 
-mkdir -p ../../output/initrd
-make CONFIG_PREFIX=../../output/initrd install
-
-cd ../../output/initrd
+cd ../output/initrd
 
 echo '#!/bin/sh' > init
 #echo 'mount -t sysfs sysfs /sys' >> init
@@ -43,8 +32,32 @@ echo '#!/bin/sh' > init
 #echo 'sysctl -w kernel.printk="2 4 1 7"'
 echo '/bin/sh' >> init
 
-find . | cpio -o -H newc > ../initrd.img
+chmod +x init
+
+find . | cpio -o -H newc > ../init.cpio
+
+cd ../../src
+
+# Kernel
+wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$KERNEL_VERSION.tar.xz
+tar -xf linux-$KERNEL_VERSION.tar.xz
+cd linux-$KERNEL_VERSION
+
+make defconfig
+
+# Change the kernel configurations
+
+./scripts/config --set-val CONFIG_FB y
+./scripts/config --set-val CONFIG_DRM_BOCHS y
+./scripts/config --set-val CONFIG_DRM_FBDEV_EMULATION y
+./scripts/config --set-val CONFIG_LOGO y
+
+# End of changing kernel configurations
+
+make || exit
+
+cp arch/x86/boot/bzImage ../../output/bzImage
 
 cd ..
 
-qemu-system-x86_64 -kernel bzImage -initrd initrd.img
+qemu-system-x86_64 -kernel ../output/bzImage -initrd ../output/init.cpio
