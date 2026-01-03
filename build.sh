@@ -32,6 +32,7 @@ cd $SOURCE_DIR
 wget https://landley.net/toybox/downloads/toybox-$TOYBOX_VERSION.tar.gz
 tar xf toybox-$TOYBOX_VERSION.tar.gz
 
+# Setting up the x86_64-linux-musl cross compiling environment
 wget https://musl.cc/x86_64-linux-musl-cross.tgz
 tar -xf x86_64-linux-musl-cross.tgz
 
@@ -44,12 +45,9 @@ cd $SOURCE_DIR
 
 # \\
 
-# // Setting up the x86_64-linux-musl cross compiling environment
+# // Copying shared libraries to rootfs
 
 cd x86_64-linux-musl-cross
-
-# Copying shared libraries to rootfs
-
 cp x86_64-linux-musl/lib/libc.so $INITRD_DIR/lib/ld-musl-x86_64.so.1
 
 cd $SOURCE_DIR
