@@ -50,8 +50,7 @@ cd x86_64-linux-musl-cross
 
 # Copying shared libraries to rootfs
 
-cp x86_64-linux-musl/lib/libc.so $INITRD_DIR/lib/libc.so
-ln -s $INITRD_DIR/lib/libc.so $INITRD_DIR/lib/ld-musl-x86_64.so.1
+cp x86_64-linux-musl/lib/libc.so $INITRD_DIR/lib/ld-musl-x86_64.so.1
 
 cd $SOURCE_DIR
 
