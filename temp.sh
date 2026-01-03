@@ -3,11 +3,23 @@
 KERNEL_VERSION=6.1.159
 TOYBOX_VERSION=0.8.13
 
-mkdir src
+BUILD_ENV_DIR=$PWD # BUILD_ENV_DIR
+
+cd configs
+CONFIG_DIR=$PWD # CONFIG_DIR
+cd ..
+
+mkdir -p src
+mkdir -p output/initrd
+
+cd output
+OUTPUT_DIR=$PWD # OUTPUT_DIR
+cd ..
+
+cd $OUTPUT_DIR/initrd
+echo $OUTPUT_DIR/initrd
+INITRD_DIR=$PWD # INITRD_DIR
+cd 
+
 cd src
-
-wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$KERNEL_VERSION.tar.xz
-tar xf linux-$KERNEL_VERSION.tar.xz
-
-wget https://landley.net/toybox/downloads/toybox-$TOYBOX_VERSION.tar.gz
-tar xf toybox-$TOYBOX_VERSION.tar.gz
+SOURCE_DIR=$PWD # SOURCE_DIR
